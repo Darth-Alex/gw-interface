@@ -34,17 +34,26 @@ namespace GuildWarsInterface.Datastructures.Components
 
                 public void Add(Type type, string baseCharacterName, string currentCharacterName = "", PlayerStatus playerStatus = PlayerStatus.Offline, Map map = 0)
                 {
-                        lock (this)
+                    lock (this)
+                    {
+                        var newEntry = new Entry(type, baseCharacterName, currentCharacterName, playerStatus, map);
+
+                        if (!_entries.ContainsKey(newEntry.BaseCharacterName))
                         {
-                                var newEntry = new Entry(type, baseCharacterName, currentCharacterName, playerStatus, map);
-
-                                _entries.Add(newEntry.BaseCharacterName, newEntry);
-
-                                if (Game.State == GameState.Playing)
-                                {
-                                        UpdateEntry(newEntry);
-                                }
+                            _entries.Add(newEntry.BaseCharacterName, newEntry);
                         }
+                        else
+                        {
+                            _entries[newEntry.BaseCharacterName] = newEntry;
+                        }
+
+
+
+                        if (Game.State == GameState.Playing)
+                        {
+                            UpdateEntry(newEntry);
+                        }
+                    }
                 }
 
                 public void Remove(string baseCharacterName)
